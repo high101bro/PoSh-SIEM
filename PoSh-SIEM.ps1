@@ -22,7 +22,9 @@ param(
 
 if (-not $Start -and -not $Stop -and -not $Check) {
     Write-Host "`n[!] " -ForegroundColor Red -NoNewline
-    Write-Host "...hey pal, you want to use one of the switches!`n" -ForegroundColor Yellow
+    Write-Host "...hey pal, you want to use one of the switches!" -ForegroundColor Yellow
+    Write-Host "`n[!] " -ForegroundColor Red -NoNewline
+    Write-Host ".\PoSh-SIEM.ps1 -Start`n" -ForegroundColor Yellow
 }
 
 if ($Start) {
@@ -293,10 +295,12 @@ if ($Start) {
 
     Write-Host "`n[!] " -ForegroundColor Red -NoNewline
     Write-Host "PoSh-SIEM is outputting sysmon logs to Out-GridView, happy hunting..." -ForegroundColor Yellow
+    Write-Host "`n[!] " -ForegroundColor Red -NoNewline
+    Write-Host "Trouble? Try running the script with elevated permissions..." -ForegroundColor Yellow
     Write-Host "`n[!] " -ForegroundColor Green -NoNewline
     Write-Host "Pro Tip... Make sure to sort by the top TimeCreated column to keep the most recent alerts at the top!`n" -ForegroundColor Yellow
 
-    Get-Job -Name "high101bro" | Receive-Job -Wait | Select-Object *  -ExcludeProperty RunspaceId, PSSourceJobInstanceId | Out-GridView -Title "PowerSiem - Powered by high101bro!"
+    Get-Job -Name "high101bro" | Receive-Job -Wait | Select-Object * -ExcludeProperty RunspaceId, PSSourceJobInstanceId | Out-GridView -Title "PowerSiem - Powered by high101bro!"
 }
 
 if ($Stop) {
