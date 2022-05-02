@@ -17,10 +17,12 @@ param(
     [switch]$Verbose,
     [switch]$Start,
     [switch]$Stop,
-    [switch]$Check
+    [switch]$Status,
+    [string[]]$ComputerName = 'localhost',
+    [PSCredential]$Credential
 )
 
-if (-not $Start -and -not $Stop -and -not $Check) {
+if (-not $Start -and -not $Stop -and -not $Status) {
     Write-Host "`n[!] " -ForegroundColor Red -NoNewline
     Write-Host "...hey pal, you want to use one of the switches!" -ForegroundColor Yellow
     Write-Host "`n[!] " -ForegroundColor Red -NoNewline
@@ -32,7 +34,19 @@ if ($Start) {
     $Running = Get-Job -Name "high101bro" -ErrorAction SilentlyContinue
 
     if (-not $Running) {
-        Start-Job -ScriptBlock {
+        $InvokeCommandSplat = @{
+            ComputerName = $ComputerName
+            AsJob        = $true
+            JobName      = 'high101bro'
+            Credential = $Credential
+        }
+
+#        if ($Credential) {
+#            $InvokeCommandSplat += @{Credential = $Credential}
+#        }
+
+        
+        $ScriptBlock = {
 
             $ErrorActionPreference = "SilentlyContinue"
 
@@ -65,7 +79,7 @@ if ($Start) {
 
             $LogName = "Microsoft-Windows-Sysmon"
 
-            $index =  (Get-WinEvent -Provider "Microsoft-Windows-Sysmon" -max 1).RecordID
+            $index = (Get-WinEvent -Provider "Microsoft-Windows-Sysmon" -max 1).RecordID
             while ($true)
             {
                 Start-Sleep 1
@@ -281,12 +295,21 @@ if ($Start) {
                             write-alert $output
                             if ($Verbose) {$evt | Select *}
                         }
-            #>            
+            #>
                     }
                     $index = $NewIndex
                 }
             }
-        } -Name "high101bro"
+        }
+
+        #$ScriptBlock = {
+        #    1..1000 | foreach {"{0} ... {1} @ {2}" -f ($_,{hostname},{Get-Date}); sleep 1}
+        #}
+
+        $InvokeCommandSplat += @{
+            ScriptBlock = $ScriptBlock
+        }
+        Invoke-Command @InvokeCommandSplat
         
         Write-Host "`n[!] " -ForegroundColor Red -NoNewline
         Write-Host "...PoSh-SIEM has started as a background job..." -ForegroundColor Yellow
@@ -320,11 +343,11 @@ if ($Stop) {
     }    
 }
 
-if ($Check) {
-    $CheckStatus = Get-Job -Name "high101bro" -ErrorAction SilentlyContinue
+if ($Status) {
+    $StatusStatus = Get-Job -Name "high101bro" -ErrorAction SilentlyContinue
 
-    if ( $CheckStatus ) {
-        $CheckStatus
+    if ( $StatusStatus ) {
+        $StatusStatus
     }
     else {
         Write-Host "`n[!] " -ForegroundColor Red -NoNewline
