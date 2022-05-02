@@ -38,12 +38,11 @@ if ($Start) {
             ComputerName = $ComputerName
             AsJob        = $true
             JobName      = 'high101bro'
-            Credential = $Credential
         }
 
-#        if ($Credential) {
-#            $InvokeCommandSplat += @{Credential = $Credential}
-#        }
+        if ($Credential) {
+            $InvokeCommandSplat += @{Credential = $Credential}
+        }
 
         
         $ScriptBlock = {
@@ -302,9 +301,6 @@ if ($Start) {
             }
         }
 
-        #$ScriptBlock = {
-        #    1..1000 | foreach {"{0} ... {1} @ {2}" -f ($_,{hostname},{Get-Date}); sleep 1}
-        #}
 
         $InvokeCommandSplat += @{
             ScriptBlock = $ScriptBlock
@@ -312,14 +308,16 @@ if ($Start) {
         Invoke-Command @InvokeCommandSplat
         
         Write-Host "`n[!] " -ForegroundColor Red -NoNewline
-        Write-Host "...PoSh-SIEM has started as a background job..." -ForegroundColor Yellow
+        Write-Host "PoSh-SIEM has started as a background job..." -ForegroundColor Yellow
 
     }
 
     Write-Host "`n[!] " -ForegroundColor Red -NoNewline
     Write-Host "PoSh-SIEM is outputting sysmon logs to Out-GridView, happy hunting..." -ForegroundColor Yellow
     Write-Host "`n[!] " -ForegroundColor Red -NoNewline
-    Write-Host "Trouble? Try running the script with elevated permissions..." -ForegroundColor Yellow
+    Write-Host "Trouble? #1: Try running the script with elevated permissions..." -ForegroundColor Yellow
+    Write-Host "`n[!] " -ForegroundColor Red -NoNewline
+    Write-Host "Trouble? #2: Make sure that sysmon is installed on the target hosts and collecting logs..." -ForegroundColor Yellow
     Write-Host "`n[!] " -ForegroundColor Green -NoNewline
     Write-Host "Pro Tip... Make sure to sort by the top TimeCreated column to keep the most recent alerts at the top!`n" -ForegroundColor Yellow
 
